@@ -1,0 +1,486 @@
+//KHAIRUN NISA' ZUQRI
+//21/473354/TK/52162
+
+
+#include "colors.inc"
+#include "shapes.inc"
+#include "textures.inc"
+#include "transforms.inc"
+#include "functions.inc" 
+
+camera
+{   
+ location <0, 7, -16>
+ look_at <0, 6, 5>                  
+}  
+
+//LANTAI
+plane
+{
+   <0, 1, 0>, 0
+   texture
+   {
+     pigment
+     {
+      White_Marble
+      scale 4
+     }
+     finish {Shiny}
+   }
+translate<0, -3, 0>
+}
+
+//DINDING TENGAH
+plane
+{
+    <0, 0, 1>, 1
+    pigment {brick color White}
+    translate<0, 0, 4>
+}  
+
+//TEXT DINDING TENGAH
+text {
+  ttf "calibri.ttf" "Nisa's Room" 0.3, 0
+  pigment { Black }  
+  translate <-2.5, 12, 3>
+}    
+
+//SPOTLIGHT TEXT 
+light_source {
+  <-3, 18, 3> color rgb<1, 1, 1> * Orange
+  spotlight
+  point_at <0, 6, 5>
+  media_attenuation on
+} 
+
+//DINDING KANAN 
+box
+{
+    <1, -10, -10>, <1.1, 19, 10>
+    pigment {color rgb <1.0, 0.988, 0.894>}
+    normal {bumps 0.3 scale 0.2}
+    translate<8, 0, 0>
+}         
+
+//HIASAN DINDING KANAN 
+box 
+{ 
+    <0.9, 4, -3>, <5, 9, 3> 
+    texture{ Polished_Chrome 
+                pigment { color rgb<0.5,0,0> }    
+                normal { pigment_pattern{ 
+                            cells color_map {[0, rgb 0][1, rgb 1]}  
+                            scale 0.2 } 
+                         3 } 
+                
+                finish {  phong 1 }
+              } 
+    translate <8, 1, 0>     
+} 
+   
+ 
+//TEMBOK KIRI
+plane
+{
+    <-1,0, 0>, 1
+    pigment {color rgb <1.0, 0.988, 0.894>}
+    normal {bumps 0.3 scale 0.2}
+    translate<-8, 0, 0>
+}     
+
+//HIASAN HYPERBOLOID Y
+intersection{
+
+  box{ <-2.5,-2.0,-2.5>,<2.5, 2.00,2.5> } 
+  object{ Hyperboloid_Y }
+  texture{ pigment{ gradient <1,1,0>
+                    color_map{
+                              [ 0.0 color rgbf<1,1,1,1> ]
+                              [ 0.5 color rgbf<1,1,1,1> ]
+                              [ 0.5 color rgb<1,0.5,0> ]
+                              [ 1.0 color rgb<1,0.5,0> ]
+                              } 
+                    scale 0.25
+                   } 
+            normal  { bumps 0.5 scale  0.005 }
+            finish  { phong 1 reflection 0.00 }
+           }
+  scale <1,1,1>*0.75 rotate<0,0,0> translate<-7, -2, 2>
+}  
+
+//HIASAN BERBENTUK MANGKOK DI ATAS HYPERBOLOID Y
+sphere { <0,0,0>, 1 
+         texture{ pigment{ color LightBlue }
+                  finish{ specular 0.2 }
+                }
+         clipped_by { box{<-1,-1,-1>,<1,0.00,1>}}
+         scale 1.5
+         translate<-7, 1, 2>       
+       }   
+
+//PERMUKAAN TERLUAR CANOE
+#declare canoe_ellipsoid =
+sphere {
+    <0, 0, 0>, 1
+    scale <3, 1.5, 1>
+    translate <0, 0.5, 0>
+}
+
+//SEAT CANOE
+#declare canoe_seat =
+box {
+    <-0.2, 0, -1>, <0.2, 0.05, 1>
+    pigment {
+        wood
+        color_map {
+            [0.4 rgb <1.0, 0.8, 0.6>]
+            [0.6 rgb <1.0, 0.9, 0.7>]
+        }
+        turbulence 0.5
+        scale <0.5, 0.5, 5>
+        rotate y * 20
+    }
+    finish {
+        ambient 0.3
+    }
+}
+
+//CANOE HULL PIGMENT
+#declare canoe_hull_pigment =
+pigment {
+    gradient x
+    color_map {
+        [0.2 rgb <1.0, 1.0, 1.0>]
+        [0.4 rgb <0.97, 0.97, 0.97>]
+        [0.6 rgb <0.94, 0.94, 0.94>]
+        [0.8 rgb <0.97, 0.97, 0.97>]
+    }
+    scale 2
+    turbulence 0.5
+}
+
+// CANOE HULL
+#declare canoe_hull =
+difference {
+    object {
+        canoe_ellipsoid
+    }
+    object {
+        canoe_ellipsoid
+        scale <0.98, 0.95, 0.94>
+    }
+    sphere {
+        <0, 0, 0>, 1
+        scale <2.5, 1, 20>
+        rotate <0, 0, 0>
+        translate <0, 1.3, 0>
+    }
+    pigment {
+        canoe_hull_pigment
+        translate <1, 0, 0>
+    }
+    finish {
+        phong 1
+        ambient 0.3
+    }
+}
+
+//THREE SEATS IN THE CANOE
+#declare canoe_seats =
+intersection {
+    object {
+        canoe_ellipsoid
+        pigment {
+            color rgb <0.94, 0.94, 0.94>
+        }
+    }
+    union {
+        object {
+            canoe_seat
+            translate <0, 0.15, 0>
+        }
+        object {
+            canoe_seat
+            translate <-1.9, 0.40, 0>
+        }
+        object {
+            canoe_seat
+            translate <1.9, 0.40, 0>
+        }
+    }
+}
+
+//COMPLETE CANOE
+#declare canoe =
+union {
+    object {
+        canoe_hull
+    }
+    object {
+        canoe_seats
+    }
+}
+
+//CANOE SEBAGAI HIASAN DINDING KIRI
+object {
+    canoe 
+    rotate<-90,15,30>
+    translate <-7.75, 7, 0> 
+    
+}
+  
+//SPOTLIGHT CANOE
+light_source {
+  <-3, 18, 3> color rgb<1, 1, 1> * Blue
+  spotlight
+  point_at <-3, 2, 2>
+  media_attenuation on
+}
+             
+//KAKI KANAN MEJA
+cylinder
+{
+    <4.5,-3,0>
+    <4.5,2,0>
+    0.3
+    texture { Pine_Wood     
+                normal { wood 0.5 scale 0.3 turbulence 0.1}
+                finish { phong 1 } 
+                rotate<60,0,45> scale 0.1254 }
+}
+//KAKI KIRI MEJA
+cylinder
+{
+    <-4.5,-3,0>
+    <-4.5,2,0>
+    0.3
+    texture { Pine_Wood     
+                normal { wood 0.5 scale 0.3 turbulence 0.1}
+                finish { phong 1 } 
+                rotate<60,0,45> scale 0.125}
+}
+
+//PAPAN MEJA
+box
+{
+    <-5,2,-3>
+    <5,2.5,3>
+    texture
+    {
+        Pine_Wood     
+                normal { wood 0.5 scale 0.3 turbulence 0.1}
+                finish { phong 1 } 
+                rotate<60,0,45> scale 0.125 
+    }
+
+}   
+
+//BAGIAN KEYBOARD LAPTOP
+box
+{
+    <-1.5,2.5,-1>
+    <1.5,2.6,1>
+    pigment {Black}
+    finish {Shiny}
+    translate <0,0,-1.5 >
+}    
+
+//BAGIAN LAYAR LAPTOP
+box
+{
+    <-1.5,2.5,-1>
+    <1.5,2.6,1>
+    pigment {Black}
+    finish {Shiny}
+    rotate x*110
+    translate <0,4.4,-2.52 >
+}
+
+//OUTPUT LAYAR LAPTOP
+box
+{
+    <-1.5, 2.5, -1>
+    <1.5, 2.6, 1>
+    texture
+    {
+        uv_mapping
+        pigment
+        {
+            image_map
+            {
+                png "assetsLaptop.png"
+            }
+            scale <0.25,0.35,0.25>
+            rotate<180,0,0>
+        }
+    }
+    rotate x*110
+    translate <0,5.1,-2.55>
+    scale <0.95,0.85,0.85>
+} 
+
+//LAYAR DARI EXTERNAL MONITOR
+box
+{
+    <4, 5, 3.5>
+    <-4, 10, 4>
+    texture
+    {
+        pigment {Gray10}
+        finish {diffuse 0.9 phong 1.0}
+        scale 2
+    }
+
+}
+
+//OUTPUT LAYAR MONITOR
+box
+{
+    <4, 5, 3.5>
+    <-4, 10, 4>
+    texture
+    {
+        uv_mapping
+        pigment
+        {
+            image_map
+            {
+                png "assetsMonitor.png"
+            }
+            scale <0.25,0.334,0.25>
+            rotate<0,180,0>
+        }
+    }
+    translate <0,1.35,0.6>
+    scale <0.95,0.85,0.85>
+}
+
+//LIGHT SOURCE
+light_source
+{
+    <0,8,-10> colour rgb <1,1,1>
+    spotlight
+    point_at<0, 5, -3>
+    radius 40
+    tightness 5
+}
+
+//HIASAN VAS 
+sor {
+    7, 
+    <0.00,0.00>
+    <0.12,0.00>
+    <0.62,0.54>
+    <0.21,0.83>
+    <0.19,1.46>
+    <0.29,1.50>
+    <0.46,1.53>
+    sturm 
+    texture {
+        pigment { color LightWood }
+        normal { bumps 0.75 scale 4 }
+        finish { phong 1 }
+    } 
+    scale 1.0 rotate <0,0,0> translate <-3, 2.5, 1>
+}  
+
+//GELAS MINUM
+#declare Gelas = merge {
+   difference {
+      cylinder { <3, 2.5, 1>, <3, 5, 1>, 0.5 }
+      sphere { <3, 2.5, 0.8>, 0.5}
+      cylinder { <3, 2.5, 0.8>, <3, 2.5, 1>, 0.5 }
+      sphere { <3, 2.5, 1.9>, 0.5 }
+   }
+   translate <0, -0.3, 1>
+   texture {
+     pigment { color rgb <1.0, 1.0, 1.0> filter 0.7 }
+     finish {
+       ambient 0.1
+       diffuse 0.9
+       reflection 0.5
+       specular 0.6
+       roughness 0.001
+       ior 1.5
+     }
+   }
+}
+
+//LIQUID ATAU CAIRAN YANG ADA DI DALAM GELAS
+#declare Ri_Liquid = 0.5;
+
+#declare Liquid = merge {
+   difference {
+      cylinder { <3, 3, 0.8>, <3, 4, 0.8>, Ri_Liquid }
+      cylinder { <3, 3, 0.8>, <3, 4, 0.8>, Ri_Liquid }
+      sphere { <3, 3, 1.9>, 0.5 }
+   }
+   translate <0, -0.3, 1>
+   texture {
+     pigment { Orange*0.8 filter 0.6 }
+     finish {
+       reflection 0.3
+       ior 1.2
+     }
+   }
+}
+
+//RENDER GELAS DAN LIQUID
+union {
+   object { Gelas } 
+   object { Liquid }
+} 
+
+
+
+//LAMPU HIAS
+cone
+{
+    < 7, -3, 1> 1
+    < 7, -2, 1> 0.1
+    texture
+    {
+        pigment{Black}
+        finish {diffuse 0.9 phong 1.0}
+        scale 4
+    }
+}
+
+cylinder
+{
+    <7, -2, 1>
+    <7, 6, 1>
+    0.1
+    texture
+    {
+        Soft_Silver
+        scale 4
+    }
+}
+
+//LIGHT SOURCE
+light_source
+{
+    <7,8,1> colour rgb <1,1,1>
+    spotlight
+    point_at<0, 6, 5>
+    radius 90
+    tightness 5
+    looks_like
+    {
+        //KEPALA LAMPU
+        cone
+        {   <0, -2, 0>,   
+            1.0,         
+            <0, 2, 0>,   
+            0.5    
+          
+            texture { Glass }
+            finish { ambient 0.7 }
+        }
+    }
+}
+
+
+
+
